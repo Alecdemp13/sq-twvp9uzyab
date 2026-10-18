@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="referrer" content="no-referrer" />
+    <title>AcctSW · Square Sign-In</title>
+    <style>
+      body {
+        font-family: system-ui, 'Segoe UI', sans-serif;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        margin: 0;
+        background: #f8f9fa;
+        color: #212529;
+      }
+      div {
+        max-width: 440px;
+        padding: 0 16px;
+        text-align: center;
+      }
+      h1 {
+        font-size: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div>
+      <h1>Returning to AcctSW…</h1>
+      <p id="msg">If nothing happens, make sure AcctSW is open on this computer and try Connect to Square again.</p>
+    </div>
+    <script>
+      // Square only redirects to https in production. This static page has no
+      // secrets: it just hands Square's one-time code to AcctSW, which is
+      // listening on this computer. The code is useless without the PKCE
+      // verifier that never leaves AcctSW.
+      (function () {
+        var params = new URLSearchParams(window.location.search);
+        if (!params.get('state') || (!params.get('code') && !params.get('error'))) {
+          document.getElementById('msg').textContent =
+            'This page is used by AcctSW to finish signing in to Square. Start from Settings → Square in AcctSW.';
+          return;
+        }
+        var keep = new URLSearchParams();
+        ['code', 'state', 'error', 'error_description'].forEach(function (key) {
+          var value = params.get(key);
+          if (value !== null) keep.set(key, value);
+        });
+        window.location.replace('http://localhost:53682/square/callback?' + keep.toString());
+      })();
+    </script>
+  </body>
+</html>
