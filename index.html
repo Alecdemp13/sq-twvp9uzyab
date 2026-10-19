@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="referrer" content="no-referrer" />
-    <title>AcctSW · Sign-In</title>
+    <title>AcctSW · Square Sign-In</title>
     <style>
       body {
         font-family: system-ui, 'Segoe UI', sans-serif;
@@ -29,7 +29,7 @@
   <body>
     <div>
       <h1>Returning to AcctSW…</h1>
-      <p id="msg">If nothing happens, make sure AcctSW is open on this computer and try connecting again.</p>
+      <p id="msg">If nothing happens, make sure AcctSW is open on this computer and try Connect to Square again.</p>
     </div>
     <script>
       // Square only redirects to https in production. This static page has no
@@ -40,19 +40,15 @@
         var params = new URLSearchParams(window.location.search);
         if (!params.get('state') || (!params.get('code') && !params.get('error'))) {
           document.getElementById('msg').textContent =
-            'This page is used by AcctSW to finish signing in to Square or Stripe. Start from Settings in AcctSW.';
+            'This page is used by AcctSW to finish signing in to Square. Start from Settings → Square in AcctSW.';
           return;
         }
         var keep = new URLSearchParams();
-        ['code', 'state', 'scope', 'error', 'error_description'].forEach(function (key) {
+        ['code', 'state', 'error', 'error_description'].forEach(function (key) {
           var value = params.get(key);
           if (value !== null) keep.set(key, value);
         });
-        // Stripe sign-ins use a "stripe_" state and AcctSW's Stripe listener; Square uses its own.
-        var target = (params.get('state') || '').indexOf('stripe_') === 0
-          ? 'http://localhost:53683/stripe/callback?'
-          : 'http://localhost:53682/square/callback?';
-        window.location.replace(target + keep.toString());
+        window.location.replace('http://localhost:53682/square/callback?' + keep.toString());
       })();
     </script>
   </body>
